@@ -78,12 +78,30 @@ def parse_cvss_short_code(short_code):
             details[metric] = f"Unknown value '{value}' for metric '{metric}'"
     return details
 
+def print_colored(text, color_code):
+    return f"\033[{color_code}m{text}\033[0m"
+
+def print_cvss_details(details):
+    # Define colors for metrics and values
+    metric_color = "1;36"   # Bold cyan
+    value_color = "1;33"    # Bold yellow
+    error_color = "1;31"    # Bold red
+
+    print(print_colored("="*40, "1;34"))
+    print(print_colored("        CVSS 4.0 Details", "1;32"))
+    print(print_colored("="*40, "1;34"))
+    for metric, description in details.items():
+        if description.startswith("Unknown value"):
+            desc = print_colored(description, error_color)
+        else:
+            desc = print_colored(description, value_color)
+        print(f"{print_colored(metric, metric_color)}: {desc}")
+    print(print_colored("="*40, "1;34"))
+
 if __name__ == "__main__":
-    short_code = input("Enter CVSS 4.0 short code: ").strip()
+    short_code = input(print_colored("Enter CVSS 4.0 short code: ", "1;35")).strip()
     try:
         details = parse_cvss_short_code(short_code)
-        print("\nCVSS 4.0 Details:")
-        for metric, description in details.items():
-            print(f"{metric}: {description}")
+        print_cvss_details(details)
     except Exception as e:
-        print(f"Error: {e}")
+        print(print_colored(f"Error: {e}", "1;31"))
